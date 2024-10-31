@@ -1,4 +1,4 @@
-import './envelope.css';
+import './Envelope.css';
 
 interface EnvelopeProps {
   address: {
@@ -11,11 +11,7 @@ interface EnvelopeProps {
 const Envelope: React.FC<EnvelopeProps> = ({ address }) => {
   return (
     <div className="envelope">
-      <div className="store-address">
-        Feels Deals<br />
-        123 Seller St.<br />
-        Townsville, ST 12345
-      </div>
+      <img src="/return-address.webp" alt="Return Address" className="return-address" />
       <div className="recipient-address">
         {address.name}<br />
         {address.street}<br />

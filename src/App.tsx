@@ -1,4 +1,4 @@
-import { useState, ChangeEvent } from 'react';
+import React, { useState, ChangeEvent } from 'react';
 import * as pdfjsLib from 'pdfjs-dist';
 import './App.css';
 import Envelope from './Envelope';
@@ -28,8 +28,6 @@ function App() {
       
       const text = textContent.items.map((item: any) => item.str).join(' ');
 
-      console.log(text);
-
       // Extract address based on known pattern
       const addressRegex = /([A-Za-z\s]+)\s(\d+\s[\w\s]+),?\s([A-Za-z\s]+),?\s([A-Z]{2})\s(\d{5}(-\d{4})?)/;
       const match = text.match(addressRegex);
@@ -38,7 +36,7 @@ function App() {
         setAddress({
           name: match[1].trim(),
           street: match[2].trim(),
-          cityStateZip: match[3].trim(),
+          cityStateZip: `${match[3].trim()}, ${match[4]} ${match[5]}`
         });
         setPdfFile(file);
       } else {
@@ -47,22 +45,98 @@ function App() {
     }
   };
 
-  const handlePrintPdf = () => {
-    if (pdfFile) {
-      const pdfWindow = window.open(URL.createObjectURL(pdfFile));
-      pdfWindow?.print();
+  const handlePrintEnvelope = () => {
+    if (address) {
+      const iframe = document.createElement('iframe');
+      document.body.appendChild(iframe);
+      iframe.style.position = 'absolute';
+      iframe.style.width = '0';
+      iframe.style.height = '0';
+      iframe.style.border = 'none';
+  
+      const doc = iframe.contentWindow?.document;
+      if (doc) {
+        doc.open();
+        doc.write(`
+          <html>
+            <head>
+              <style>
+                /* Load Berlin Sans FB font from the public folder */
+                @font-face {
+                  font-family: 'Berlin Sans FB';
+                  src: url('${window.location.origin}/brlnsr.ttf') format('truetype');
+                  font-weight: normal;
+                  font-style: normal;
+                }
+  
+                @page { size: 9.5in 4.125in; margin: 0; }
+                body { margin: 0; font-family: 'Berlin Sans FB', Arial, sans-serif; }
+  
+                .envelope {
+                  width: 9.5in;
+                  height: 4.125in;
+                  padding: 0.5in;
+                  position: relative;
+                  box-sizing: border-box;
+                  color: black;
+                  background-color: white;
+                }
+  
+                .return-address {
+                  position: absolute;
+                  top: 0.5in;
+                  left: 0.5in;
+                  width: 2in; /* Adjust width as needed */
+                }
+  
+                .recipient-address {
+                  position: absolute;
+                  top: 1.5in;
+                  left: 3in;
+                  width: 4in;
+                  text-align: left;
+                  font-size: 26px;
+                  line-height: 1.4;
+                  color: black;
+                }
+              </style>
+            </head>
+            <body>
+              <div class="envelope">
+                <img src="${window.location.origin}/return-address.webp" alt="Return Address" class="return-address" />
+                <div class="recipient-address">
+                  ${address.name}<br />
+                  ${address.street}<br />
+                  ${address.cityStateZip}
+                </div>
+              </div>
+            </body>
+          </html>
+        `);
+        doc.close();
+        
+        iframe.contentWindow?.focus();
+        iframe.contentWindow?.print();
+      }
+      
+      // Clean up iframe after printing
+      setTimeout(() => {
+        document.body.removeChild(iframe);
+      }, 1000);
     }
-  };
+  };  
 
   return (
     <div className="App">
       <h1>Envelope Printer</h1>
       <input type="file" accept=".pdf" onChange={handleFileChange} />
-      <button onClick={handlePrintPdf} disabled={!pdfFile}>Print Original PDF</button>
+      <button onClick={() => pdfFile && window.open(URL.createObjectURL(pdfFile))?.print()} disabled={!pdfFile}>
+        Print Original PDF
+      </button>
       {address && (
         <>
           <Envelope address={address} />
-          <button onClick={() => window.print()}>Click to Print Envelope</button>
+          <button onClick={handlePrintEnvelope}>Click to Print Envelope</button>
         </>
       )}
     </div>

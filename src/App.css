@@ -1,11 +1,15 @@
+@font-face {
+  font-family: 'Berlin Sans FB';
+  src: url('/brlnsr.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+body {
+  font-family: Arial, sans-serif;
+}
+
 .App {
   text-align: center;
   padding: 20px;
-}
-
-button {
-  margin: 10px;
-  padding: 10px;
-  font-size: 16px;
-  cursor: pointer;
 }
