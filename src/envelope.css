@@ -1,0 +1,26 @@
+.envelope {
+  width: 9.5in;
+  height: 4.125in;
+  padding: 0.5in;
+  position: relative;
+  font-family: Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+.store-address {
+  position: absolute;
+  top: 0.5in;
+  left: 0.5in;
+  font-size: 12px;
+  line-height: 1.2;
+}
+
+.recipient-address {
+  position: absolute;
+  top: 1.5in;
+  left: 3in;
+  width: 4in;
+  text-align: left;
+  font-size: 16px;
+  line-height: 1.4;
+}
